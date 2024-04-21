@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -11,11 +13,12 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Crypto currencies list',
+      title: 'Crypto Currencies List',
       theme: ThemeData(
         scaffoldBackgroundColor: const Color.fromARGB(255, 36, 36, 36),
         dividerColor: Colors.white10,
         appBarTheme: const AppBarTheme(
+          iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: Color.fromARGB(255, 36, 36, 36),
           titleTextStyle: TextStyle(
             color: Colors.white,
@@ -39,56 +42,94 @@ class App extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.yellow),
         useMaterial3: true,
       ),
-      home: const MyHomePage(),
+      routes:{
+        '/':(context) => const CryptoListScreen(),
+        '/coin': (context) => const CryptoCoinScreen()
+      }
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class CryptoListScreen extends StatefulWidget {
+  const CryptoListScreen({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<CryptoListScreen> createState() => _CryptoListScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
+class _CryptoListScreenState extends State<CryptoListScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Crypto currencies list'),
+        title: const Text('Crypto Currencies List'),
       ),
       body: ListView.separated(
         itemCount: 10,
         separatorBuilder: (context, index) => const Divider(),
-        itemBuilder: (context, index) => ListTile(
-          leading: SvgPicture.asset(
-            'assets/svg/bitcoin_logo.svg',
-            height: 30,
-            width: 30,
-          ),
-          title: Text(
-            'Bitcoin',
-            style: theme.textTheme.bodyMedium
-          ),
-          subtitle: Text(
-            '20000\$',
-            style: theme.textTheme.labelSmall
-          ),
-          trailing: const Icon(Icons.arrow_forward_ios),
-        )
+        itemBuilder: (context, index) {
+          const coinName = 'Bitcoin';
+          return ListTile(
+            leading: SvgPicture.asset(
+              'assets/svg/bitcoin_logo.svg',
+              height: 30,
+              width: 30,
+            ),
+            title: Text(
+              coinName,
+              style: theme.textTheme.bodyMedium
+            ),
+            subtitle: Text(
+              '20000\$',
+              style: theme.textTheme.labelSmall
+            ),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                '/coin',
+                arguments: coinName
+              );
+            },
+          );
+        },
       ),
+    );
+  }
+}
+
+class CryptoCoinScreen extends StatefulWidget {
+  const CryptoCoinScreen({super.key});
+
+  @override
+  State<CryptoCoinScreen> createState() => _CryptoCoinScreenState();
+}
+
+class _CryptoCoinScreenState extends State<CryptoCoinScreen> {
+  String? coinName;
+
+  @override
+  void didChangeDependencies() {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    assert(args != null && args is String, 'You must provide String args');
+    // if (args == null) {
+    //   print('You must provide args');
+    //   return;
+    // }
+    // if (args is! String) {
+    //   print('You must provide String args');
+    //   return;
+    // }
+    coinName = args as String;
+    setState(() {});
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(coinName ?? '...')),
     );
   }
 }

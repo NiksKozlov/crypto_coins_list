@@ -23,6 +23,7 @@ dependencies:
   talker_bloc_logger: ^4.1.5
   firebase_core: ^2.30.1
   json_annotation: ^4.9.0
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:

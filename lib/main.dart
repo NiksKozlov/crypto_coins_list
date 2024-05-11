@@ -18,7 +18,7 @@ void main() async {
   final talker = TalkerFlutter.init();
   GetIt.I.registerSingleton(talker);
 
-  await Hive.initFlutter();
+  const cryptoCoinsBoxName = 'crypto_coins_box';
 
   final dio = Dio();
   dio.interceptors.add(TalkerDioLogger(
@@ -36,9 +36,7 @@ void main() async {
     )
   );
 
-  GetIt.I.registerLazySingleton<AbstractCoinsRepository>(
-    () => CryptoCoinsRepository(dio: dio)
-  );
+  
 
   FlutterError.onError =
       (details) => GetIt.I<Talker>().handle(details.exception, details.stack);
@@ -48,6 +46,16 @@ void main() async {
       WidgetsFlutterBinding.ensureInitialized();
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform
+      );
+
+      await Hive.initFlutter();
+      Hive.registerAdapter(CryptoCoinAdapter());
+      Hive.registerAdapter(CryptoCoinDetailAdapter());
+
+      final cryptoCoinsBox = await Hive.openBox<CryptoCoin>(cryptoCoinsBoxName);
+
+      GetIt.I.registerLazySingleton<AbstractCoinsRepository>(
+        () => CryptoCoinsRepository(dio: dio, cryptoCoinsBox: cryptoCoinsBox)
       );
 
       return runApp(const CryptoCurrenciesListApp());
